@@ -1,0 +1,98 @@
+#include <iostream>
+#include <queue>
+#include <algorithm>
+#include <map>
+#include <tuple>
+#include <string>
+using namespace std;
+typedef long long ll;
+#define INF 5000001
+typedef pair<ll, int>set;
+void dijkstra(deque<set>*list, int start,int size,ll*dis)
+{
+	bool*visit = new bool[size+1]();
+	dis[start] = 0;
+	priority_queue<set, deque<set>, greater<set>>pq;
+	pq.push({ 0,start });
+	while (!pq.empty())
+	{
+
+		int curNode = pq.top().second;
+		ll curWeight = pq.top().first;
+		pq.pop();
+		for (auto& edge : list[curNode])
+		{
+			int nextNode = edge.second;
+			ll nextWeight = edge.first + curWeight;
+			if (dis[nextNode] > nextWeight&&!visit[nextNode])
+			{
+				dis[nextNode] = nextWeight;
+				pq.push({ nextWeight,nextNode });
+			}
+		}
+		visit[curNode] = true;
+		
+	}
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	
+	
+	int test;
+	cin >> test;
+	for (int t = 0; t < test; t++)
+	{
+		int n, m, target,start,g,h;
+		cin >> n >> m >> target >> start >> g >> h;
+
+		deque<set>*list = new deque<set>[n + 1];
+		deque<set>targetList;
+		deque<int>result;
+		ll*dis = new ll[n + 1]();
+		fill(dis, dis + n + 1, INF);
+		for (int i = 0; i < m; i++)
+		{
+			int v1, v2, weight;
+			cin >> v1 >> v2 >> weight;
+			list[v1].push_back({ weight,v2 });
+			list[v2].push_back({ weight,v1 });
+		}
+		dijkstra(list, start, n, dis);
+		for (int i = 0; i < target; i++)
+		{
+			int v;
+			cin >> v;
+			targetList.push_back({dis[v],v});
+		}
+		// s -> g -> h ->targetList
+		// h to targetList dijkstra
+		ll betweenGtoH;
+		ll StoGToH = dis[g];
+		ll StoHtoG = dis[h];
+		fill(dis, dis + n + 1, INF);
+		dijkstra(list, g, n, dis);
+		
+		betweenGtoH = dis[h];
+		StoGToH += betweenGtoH;
+		StoHtoG += betweenGtoH;
+		for (auto& ele : targetList)
+		{
+			if (StoHtoG + dis[ele.second] == ele.first)
+				result.push_back(ele.second);
+		}
+		fill(dis, dis + n + 1, INF);
+		dijkstra(list, h, n, dis);
+		for (auto& ele : targetList)
+		{
+			if (StoGToH + dis[ele.second] == ele.first)
+				result.push_back(ele.second);
+		}
+		sort(result.begin(), result.end());
+		for (auto& edge : result)
+			cout << edge << " ";
+		cout << "\n";
+	}
+	
+}
