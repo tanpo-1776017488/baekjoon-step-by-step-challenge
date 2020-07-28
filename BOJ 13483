@@ -1,0 +1,71 @@
+#include <iostream>
+#include <queue>
+#include <algorithm>
+#include <map>
+#include <tuple>
+#include <string>
+using namespace std;
+
+typedef long long ll;
+struct Birtday
+{
+	int year;
+	int month;
+	int day;
+	int number;
+};
+bool cmp(Birtday&op1, Birtday&op2)
+{
+	if (op1.year > op2.year)
+		return true;
+	if (op1.year == op2.year)
+	{
+		if (op1.month > op2.month)
+			return true;
+		if (op1.month == op2.month)
+		{
+			if (op1.day > op2.day)
+				return true;
+			return false;
+		}
+		return false;
+	}
+	return false;
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	Birtday k;
+	cin >> k.day >> k.month >> k.year;
+	deque<Birtday>list;
+	int n;
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		Birtday t;
+		cin >> t.day >> t.month >> t.year;
+
+		t.number = i + 1;
+		if (k.year - t.year>18)
+			list.push_back(t);
+		else if (k.year - t.year == 18)//여기서 생년월일 기준으로 18살이 충족되지 않는 사람들은 제외
+		{
+			if (k.month > t.month)
+				list.push_back(t);
+			else if (k.month == t.month)
+			{
+				if (k.day >=t.day)
+					list.push_back(t);
+			}
+		}
+	}
+	sort(list.begin(), list.end(),cmp);
+	
+	if (list.empty())
+		cout << -1;
+	else
+		cout << list.front().number;
+
+	
+}
