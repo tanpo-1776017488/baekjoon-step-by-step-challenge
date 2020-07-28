@@ -1,0 +1,85 @@
+#include <iostream>
+#include <queue>
+#include <algorithm>
+#include <map>
+#include <tuple>
+#include <string>
+using namespace std;
+typedef long long ll;
+#define INF 5000001
+void Floyd(int**map, int size)
+{
+	for (int flag = 1; flag <= size; flag++)
+	{
+		for (int i = 1; i <= size; i++)
+		{
+			for (int j = 1; j <= size; j++)
+				if(i!=j)
+					map[i][j] = std::min(map[i][j], map[i][flag] + map[flag][j]);
+
+		}
+	}
+}
+void init(int**map, int size)
+{
+	for (int i = 1; i <= size; i++)
+		for (int j = 1; j <= size; j++)
+			map[i][j] = INF;
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	
+	int test;
+	cin >> test;
+	for (int t = 0; t < test; t++)
+	{
+		int n, m, target,s,g,h;
+		cin >> n >> m >> target;
+		cin >> s >> g >> h;
+		int**map = new int*[n + 1]();
+		deque<int>targetList;
+		for (int i = 1; i < n + 1; i++)
+			map[i] = new int[n + 1]();
+
+		init(map, n);
+		for (int i = 0; i < m; i++)
+		{
+			int v1, v2, weight;
+			cin >> v1 >> v2 >> weight;
+			map[v1][v2] = weight;
+			map[v2][v1] = weight;
+		}
+
+		for (int i = 0; i < target; i++)
+		{
+			int v;
+			cin >> v;
+			targetList.push_back(v);
+		}
+		sort(targetList.begin(), targetList.end());
+		Floyd(map, n);
+
+		//s ->g ->h ->targetList
+		ll first = map[s][g] + map[g][h];
+		//s ->h ->g ->targetList
+		ll second = map[s][h] + map[h][g];
+		//s ->targetList
+		deque<int>result;
+		for (int i = 0; i < targetList.size(); i++)
+		{
+			ll finalDis = map[s][targetList[i]];
+			ll firstCmp = first + map[h][targetList[i]];
+			ll SecondCmp = second + map[g][targetList[i]];
+
+			if (finalDis == firstCmp||SecondCmp==finalDis)
+				result.push_back(targetList[i]);
+		}
+		for (auto& edge : result)
+			cout << edge << " ";
+		cout << "\n";
+	}
+	
+	
+}
