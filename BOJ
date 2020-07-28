@@ -1,0 +1,201 @@
+//BOJ 19238 스타트 택시
+#include <iostream>
+#include <queue>
+#include <algorithm>
+#include <tuple>
+using namespace std;
+typedef pair<int, int> set;
+struct passenger
+{
+	int curRow;
+	int curCol;
+	int desRow;
+	int desCol;
+	int number;
+
+};
+bool**init(int size)
+{
+	bool**check = new bool*[size + 1]();
+	for (int i = 1; i <= size; i++)
+		check[i] = new bool[size + 1]();
+
+	return check;
+}
+int findTarget(int**map, pair<int, int>start, pair<int, int>des,int size,int feul)
+{
+	queue<pair<int, int>>que, tmp;
+	que.push(start);
+	bool**check = init(size);
+	check[start.first][start.second] = true;
+	int dx[4] = { -1,1,0,0 };
+	int dy[4] = { 0,0,-1,1 };
+	int usingFuel = 0;
+	while (!que.empty())
+	{
+		int row = que.front().first;
+		int col = que.front().second;
+		if (row == des.first&&col == des.second)
+			return usingFuel;
+		for (int i = 0; i < 4; i++)
+		{
+			int newRow = row + dx[i];
+			int newCol = col + dy[i];
+			if (newRow > 0 && newRow <= size && newCol > 0 && newCol <= size)
+			{
+				if (check[newRow][newCol] == false && map[newRow][newCol] != 1)
+				{
+					tmp.push(make_pair(newRow, newCol));
+					check[newRow][newCol] = true;
+				}
+			}
+		}
+		
+		que.pop();
+		if (que.empty())
+		{
+			usingFuel++;
+			if (usingFuel > feul)
+				break;
+			while (!tmp.empty())
+			{
+				que.push(tmp.front());
+				tmp.pop();
+			}
+		}
+		
+
+	}
+	return -1;
+}
+tuple<int,int,int> BFS(pair<int,int>start,int size,int**map)
+{
+	queue<pair<int, int>>que, tmp;
+	que.push(start);
+	bool state = false;
+	int dx[4] = { -1,1,0,0 };
+	int dy[4] = { 0,0,-1,1 };
+	bool**check = init(size);
+	int fuel = 0;
+	while (!que.empty())
+	{
+		int row = que.front().first;
+		int col = que.front().second;
+		if (map[row][col] == -1)
+		{
+			map[row][col] = 0;
+			return make_tuple(row, col, fuel);
+		}
+		for (int i = 0; i < 4; i++)
+		{
+			int newRow = row + dx[i];
+			int newCol = col + dy[i];
+			if (newRow > 0 && newRow <= size && newCol > 0 && newCol <= size)
+			{
+				if (check[newRow][newCol] == false&&map[newRow][newCol]!=1)
+				{
+					check[newRow][newCol] = true;
+					tmp.push(make_pair(newRow, newCol));
+				}
+			}
+		}
+		que.pop();
+		if (que.empty())
+		{
+			fuel++;
+			deque<pair<int,int>>t_list;
+			while (!tmp.empty())
+			{
+				pair<int, int> t = tmp.front();
+				if (map[t.first][t.second] == -1)
+					t_list.push_back(t);
+					
+				
+				que.push(t);
+				tmp.pop();
+
+			}
+			if (t_list.size()>=2)
+			{
+				sort(t_list.begin(), t_list.end());
+				pair<int, int>t = t_list.front();
+				map[t.first][t.second] = 0;
+				return make_tuple(t.first, t.second, fuel);
+			}
+		}
+		
+		
+	}
+	return make_tuple(-1, -1, -1);
+}
+int SearchTarget(int**map, int size, pair<int, int>start,deque<passenger>&list,int fuel)
+{
+	int count = list.size() - 1;
+	while (count != 0)
+	{
+		tuple<int, int, int> info = BFS(start, size, map);
+		int row = get<0>(info);
+		int col = get<1>(info);
+		int searchfuel = get<2>(info);
+		int desRow = -1, desCol = -1;
+		for (int i = 1; i <list.size(); i++)
+		{
+			if (list[i].curRow == row && list[i].curCol==col)
+			{
+				desRow = list[i].desRow;
+				desCol = list[i].desCol;
+				break;
+			}
+		}
+		if (desRow == -1)
+			return -1;
+		if (searchfuel > fuel)
+			return -1;
+		fuel -= searchfuel;
+		int usingFuel = findTarget(map, make_pair(row,col), make_pair(desRow, desCol), size, fuel);
+		if (usingFuel == -1)
+			return -1;
+		fuel -= usingFuel;
+		fuel += 2 * usingFuel;
+		start.first = desRow, start.second = desCol;
+		count--;
+	}
+	return fuel;
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	int size, people,fuel;
+	cin >> size >> people>>fuel;
+	int**map = new int*[size + 1]();
+	bool***check = new bool**[size + 1]();
+	for (int i = 1; i <= size; i++)
+	{
+		check[i] = new bool*[size + 1]();
+		for (int j = 1; j <= size; j++)
+			check[i][j] = new bool[people + 1]();
+	}
+	for (int i = 1; i <= size; i++)
+		map[i] = new int[size + 1]();
+
+	for (int i = 1; i <= size; i++)
+		for (int j = 1; j <= size; j++)
+			cin >> map[i][j];
+
+	int startRow, startCol;
+	cin >> startRow >> startCol;
+	deque<passenger>list(people+1);
+	for (int i = 0; i < people; i++)
+	{
+		passenger p;
+		cin >> p.curRow >> p.curCol >> p.desRow >> p.desCol;
+		map[p.curRow][p.curCol] = -1;
+		p.number = i + 1;
+		list[i + 1] = p;
+	}
+	cout<<SearchTarget(map, size, make_pair(startRow, startCol), list, fuel);
+
+}
+
+
