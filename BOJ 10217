@@ -1,0 +1,74 @@
+#include <iostream>
+#include <queue>
+#include <algorithm>
+#include <map>
+#include <tuple>
+#include <string>
+using namespace std;
+typedef long long ll;
+#define INF 200000000
+typedef pair<pair<int, int>, int>set;
+void dijkstra(deque<pair<int,int>>*dis, deque<set>*map, int start,int size,int limit)
+{
+	bool*visit = new bool[size+1]();
+	priority_queue<set, deque<set>, greater<set>>pq;
+	pq.push({ {0,0},start });
+	
+	while (!pq.empty())
+	{
+		int curNode = pq.top().second;
+		int curWeight = pq.top().first.second;
+		int curTime = pq.top().first.first;
+		pq.pop();
+		for (auto& edge : map[curNode])
+		{
+			int nextNode = edge.second;
+			int nextTime = curTime + edge.first.first;
+			int nextWeight = curWeight + edge.first.second;
+			if (!visit[nextNode]&&nextWeight<=limit)
+				pq.push({ {nextTime,nextWeight},nextNode }), dis[nextNode].push_back({ nextTime,nextWeight });
+		}
+
+		visit[curNode] = true;
+	}
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	
+	int test;
+	cin >> test;
+	
+	for (int t = 0; t < test; t++)
+	{
+		int vertex, money, edge;
+		cin >> vertex >> money >> edge;
+		deque<set>*list = new deque<set>[vertex + 1];
+		deque<pair<int,int>>*dis = new deque<pair<int,int>>[vertex + 1];
+		for (int i = 0; i < edge; i++)
+		{
+			int u, v, c, d;
+			cin >> u >> v >> c >> d;
+			list[u].push_back({ {d,c},v });
+		}
+		dijkstra(dis, list, 1, vertex, money);
+		sort(dis[vertex].begin(), dis[vertex].end());
+		int time = -1;
+		for (auto info : dis[vertex])
+		{
+			if (money >= info.second)
+			{
+				time = info.first;
+				break;
+			}
+		}
+		if (time == -1)
+			cout << "Poor KCM";
+		else
+			cout << time;
+		cout << "\n";
+	}
+	
+	
+}
