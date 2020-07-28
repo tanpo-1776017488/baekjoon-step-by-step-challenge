@@ -1,0 +1,61 @@
+#include <iostream>
+#include <queue>
+#include <algorithm>
+#include <map>
+#include <tuple>
+#include <string>
+using namespace std;
+typedef long long ll;
+#define INF 1700000000
+void floyd(ll**map, int size)
+{
+	for (int f = 1; f <= size; f++)
+	{
+		for (int i = 1; i <= size; i++)
+		{
+			for (int j = 1; j <= size; j++)
+				if(i!=j)
+					map[i][j] = std::min(map[i][j], map[i][f] +map[f][j]);
+		}
+	}
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	
+	int vertex, edge;
+	cin >> vertex >> edge;
+	ll**map = new ll*[vertex + 1];//long long 안쓰면 overflow
+	for (int i = 1; i < vertex + 1; i++)
+		map[i] = new ll[vertex + 1]();
+
+	for (int i = 1; i <= vertex; i++)
+		for (int j = 1; j <= vertex; j++)
+			map[i][j] = INF;
+
+	for (int i = 0; i < edge; i++)
+	{
+		int v1, v2, weight;
+		cin >> v1 >> v2 >> weight;
+		map[v1][v2] = weight;
+	}
+	floyd(map, vertex);
+
+	int minCycle = INF;
+	for (int i = 1; i <= vertex; i++)
+	{
+		for (int j = 1; j <= vertex; j++)
+		{
+			if (i != j && map[i][j] + map[j][i] < minCycle)
+				minCycle = map[i][j] + map[j][i];
+		}
+	}
+	
+	if (minCycle == INF)
+		cout << -1;
+	else
+		cout << minCycle;
+	
+	
+}
