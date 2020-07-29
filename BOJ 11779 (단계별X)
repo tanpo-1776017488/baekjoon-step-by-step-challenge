@@ -1,0 +1,72 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <algorithm>
+using namespace std;
+typedef long long ll;
+#define INF 117440512
+
+void dijkstra(deque<pair<int, int>>*list, ll*dis, int*trace,int start)
+{
+	priority_queue<pair<int, int>, deque<pair<int, int>>, greater<pair<int, int>>>pq;
+	pq.push({ 0,start });
+	dis[start] = 0;
+	while (!pq.empty())
+	{
+		int curNode = pq.top().second;
+		int curWeight = pq.top().first;
+		pq.pop();
+		if (dis[curNode] < curWeight)
+			continue;
+
+		for (auto& edge : list[curNode])
+		{
+			int nextNode = edge.second;
+			int nextWeight = edge.first + curWeight;
+			if (dis[nextNode] > nextWeight)
+			{
+				dis[nextNode] = nextWeight;
+				pq.push({ nextWeight,nextNode });
+				trace[nextNode] = curNode;
+			}
+		}
+	}
+}
+void TracePath(int*path, int count,int cur)
+{
+	if (cur == 0)
+	{
+		cout << count<<"\n";
+		return;
+	}
+	TracePath(path, count + 1, path[cur]);
+	cout << cur << " ";
+}
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	int vertex, edge;
+	cin >> vertex >> edge;
+	ll*dis = new ll[vertex + 1]();
+	int*trace = new int[vertex + 1]();
+	fill(dis, dis + vertex + 1, INF);
+	deque<pair<int,int>>*list = new deque<pair<int, int>>[vertex + 1];
+	for (int i = 0; i < edge; i++)
+	{
+		int start, des, weight;
+		cin >> start >> des >> weight;
+		list[start].push_back({ weight,des });
+	}
+	int start, des;
+	cin >> start >> des;
+	deque<int>path;
+	dijkstra(list, dis, trace, start);
+	
+	cout << dis[des] << "\n";
+	TracePath(trace, 0, des);
+	
+	
+
+	
+}
