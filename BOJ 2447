@@ -1,0 +1,50 @@
+#include <iostream>
+#include <queue>
+#include <map>
+using namespace std;
+typedef long long ll;
+void devide(int n, int x, int y, char**map)
+{
+	if (n == 1)
+	{
+		map[x][y] = '*';
+		return;
+	}
+	int div = n / 3;
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+		{
+			if (i == 1 && j == 1)
+				continue;
+			devide(div, x + (div*i), y + (div*j), map);
+		}
+	return;
+}
+void init(int n, char**map)
+{
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			map[i][j] = ' ';
+}
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+
+	int n;
+	cin >> n;
+	char**map = new char*[n];
+	for (int i = 0; i < n; i++)
+		map[i] = new char[n]();
+	init(n, map);
+	devide(n, 0, 0, map);
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+			cout << map[i][j];
+		cout << "\n";
+	}
+	//https://j3sung.tistory.com/65 참조
+	//별이 없는 공백란은 Space로 채워주어야 함
+	//unit 3 by 3
+}
