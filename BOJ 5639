@@ -1,0 +1,85 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+using namespace std;
+
+char buf[1 << 17];
+
+inline char read() {
+	static int idx = 1 << 17;
+	if (idx == 1 << 17) {
+		fread(buf, 1, 1 << 17, stdin);
+		idx = 0;
+	}
+	return buf[idx++];
+}
+inline int readInt() {
+	int t, r = read() & 15;
+	while ((t = read()) & 16) r = r * 10 + (t & 15);
+	return r;
+}
+struct Node
+{
+	int number;
+	Node*left = nullptr;
+	Node*right = nullptr;
+	Node*parent = nullptr;
+};
+void makeBranch(Node*root, int number)//개선의 여지가 많음
+{
+
+	if (root->number > number)
+	{
+		if(root->left!=nullptr)
+			makeBranch(root->left, number);
+		else
+		{
+			root->left = new Node();
+			root->left->number = number;
+			return;
+		}
+	}
+	else
+	{
+		if(root->right!=nullptr)
+			makeBranch(root->right, number);
+		else
+		{
+			root->right = new Node();
+			root->right->number = number;
+			return;
+		}
+	}
+
+}
+void postorder(Node*root)//후위 순회
+{
+	
+	if (root->left != nullptr)
+		postorder(root->left);
+	
+	if(root->right!=nullptr)
+		postorder(root->right);
+	cout << root->number << "\n";
+}
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	int number;
+	Node* root = nullptr;
+	while (cin >> number)
+	{
+		if (root == nullptr)
+		{
+			root = new Node();
+			root->number = number;
+		}
+		else
+		{
+			Node* tmp = root;
+			makeBranch(root, number);
+		}
+	}
+	postorder(root);
+}
