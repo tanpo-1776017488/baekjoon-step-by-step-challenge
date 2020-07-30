@@ -1,0 +1,74 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <algorithm>
+#include <tuple>
+#include <string>
+using namespace std;
+typedef long long ll;
+void findRow(int row, int col, deque<string>&result,char**map)
+{
+	for (int i = 0; i < row; i++)
+	{
+		int curCol = 0;
+		string s;
+		while (curCol < col)
+		{
+			if (map[i][curCol] == '#')
+			{
+				if (s.size() > 1)
+					result.push_back(s);
+				s.clear();
+			}
+			else
+				s.push_back(map[i][curCol]);
+			curCol++;
+		}
+		if (s.size() > 1)
+			result.push_back(s);
+	}
+}
+void FindCol(int row, int col, deque<string>&result, char**map)
+{
+	for (int i = 0; i < col; i++)
+	{
+		int curRow = 0;
+		string s;
+		while (curRow < row)
+		{
+			if (map[curRow][i] == '#')
+			{
+				if (s.size() > 1)
+					result.push_back(s);
+				s.clear();
+			}
+			else
+				s.push_back(map[curRow][i]);
+			curRow++;
+		}
+		if (s.size() > 1)
+			result.push_back(s);
+	}
+}
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	
+	
+	int row, col;
+	cin >> row >> col;
+	char**map = new char*[row];
+	for (int i = 0; i < row; i++)
+		map[i] = new char[col]();
+
+	for (int i = 0; i < row; i++)
+		for (int j = 0; j < col; j++)
+			cin >> map[i][j];
+
+	deque<string>result;
+	FindCol(row, col, result, map);
+	findRow(row, col, result, map);
+	sort(result.begin(), result.end());
+	cout << result.front();
+}
