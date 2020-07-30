@@ -1,0 +1,25 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <algorithm>
+#include <tuple>
+using namespace std;
+
+typedef long long ll;
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+
+	ll number;
+	cin >> number;
+	ll*fibo = new ll[1500001]();
+	fibo[1] = 1;
+	fibo[2] = 1;
+	for (int i = 3; i <= 1500000; i++)
+		fibo[i] = (fibo[i - 1] + fibo[i - 2]) % 1000000;
+	cout << fibo[number % 1500000];
+	
+  //피사노 주기
+  //reference https://kyunstudio.tistory.com/58
+}
