@@ -1,0 +1,67 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <algorithm>
+#include <tuple>
+using namespace std;
+typedef long long ll;
+ll**init(int size)
+{
+	ll **mtrx = new ll*[size]();
+	for (int i = 0; i < size; i++)
+		mtrx[i] = new ll[size]();
+	for (int i = 0; i < size; i++)
+		for (int j = 0; j < size; j++)
+			if(i!=1||j!=1)
+				mtrx[i][j] = 1;
+	return mtrx;
+}
+ll** sqaure(ll**arr, ll**t_arr, int size, int rest)
+{
+	ll **result = init(size);
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			ll value = 0;
+			for (int k = 0; k < size; k++)
+				value += (arr[i][k] * t_arr[k][j]) % rest;
+			result[i][j] = value % rest;
+		}
+	}
+	return result;
+}
+ll** calculate(ll**ori, ll target, int rest, ll**result, int size)
+{
+	while (target > 0)
+	{
+		if (target % 2 != 0)
+			result = sqaure(result, ori, size, rest);
+		ori = sqaure(ori, ori, size, rest);
+		target /= 2;
+	}
+	return result;
+}
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	
+	ll number;
+	cin >> number;
+	int fibo[4] = { 0,1,1,2 };
+	if (number < 4)
+		cout << fibo[number];
+	else
+	{
+		ll count = number - 2;
+		ll **result = init(2);
+		ll**orgin = init(2);
+		result=calculate(orgin, count, 1000000, result, 2);
+		
+		cout << result[0][0];
+	}
+
+    // 피보나치를 행렬로 변환하여 행렬의 제곱 수 구하기 문제로 변환
+	
+}
